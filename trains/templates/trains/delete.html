@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Delete train{% endblock %}
+
+{% block content %}
+<h1>Delete train</h1>
+<p>{{ object }}</p>
+
+{% include 'form.html' with button='Delete' %}
+
+{% endblock %}
