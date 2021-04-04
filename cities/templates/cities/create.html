@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
 {% block title %}Create city{% endblock %}
 
+
+
 {% block content %}
 <h1>Create city</h1>
 
+<div class='center'> 
 {% include 'form.html' with button='Save' %}
-
+<h5>Import from excel file</h5>
+<a href="{% url 'cities:upload' %}" >
+<button class='btn btn-primary'>Import</button>
+</a>
+</div>
 {% endblock %}

@@ -16,3 +16,6 @@ class CityForm(forms.ModelForm):
     class Meta:
         model = City
         fields = ('name', )
+
+class UploadForm(forms.Form):
+    file = forms.FileField()
