@@ -6,4 +6,8 @@
 
 {% include 'form.html' with button='Save' %}
 
+    <h5>Import from excel file to create <b>trains</b></h5>
+    <a href="{% url 'trains:upload' %}" >
+        <button class='btn btn-primary'>Import</button>
+    </a>
 {% endblock %}

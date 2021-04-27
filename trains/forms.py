@@ -26,3 +26,6 @@ class TrainForm(forms.ModelForm):
     class Meta:
         model = Train
         fields = '__all__'
+
+class UploadTrainForm(forms.Form):
+    file = forms.FileField()

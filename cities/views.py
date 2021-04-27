@@ -10,12 +10,12 @@ from django.views.generic import DetailView, CreateView, UpdateView, DeleteView,
 from cities.forms import HtmlForm, CityForm, UploadForm
 from cities.models import City
 from rest_framework.views import APIView
-from django.shortcuts import redirect
 from pyexcel_xls import get_data as xls_get
 from pyexcel_xlsx import get_data as xlsx_get
 from django.utils.datastructures import MultiValueDictKeyError
-
-
+from django.contrib import messages
+from django.shortcuts import redirect
+import tablib
 
 __all__ = (
     'home', 'CityDetailView', 'CityCreateView', 'CityUpdateView',
@@ -37,24 +37,27 @@ __all__ = (
 #         else:
 #             return redirect('')
 
-def upload(request):
-    form = UploadForm(request.POST, request.FILES)
-    if request.method == 'POST':
-        try:
-            myfile = request.FILES['file']
-        except MultiValueDictKeyError:
-            return redirect(reverse_lazy('cities:home'))
-        if str(myfile).split('.')[-1] == 'xls':
-            data = xls_get(myfile, column_limit=2)
-        elif str(myfile).split('.')[-1] == 'xlsl':
-            data = xlsx_get(myfile, column_limit=2)
-        cities = data['citites']
-        for city in cities:
-            if len(city) > 0:
-                if city[0] != 'No':
-                    name = city[1]
-                    City.objects.create(name=name)
+def handle_city_import(raw_data):
+    dataset = tablib.Dataset().load(raw_data)
+    headers = [
+        x.lower().replace(' ', '_') for x in dataset.headers if x is not None
+    ]
+    if len(headers) > 1:
+        raise Exception('Invalid format to import cities')
+    for row in dataset:
+        City.objects.create(name=row[0])
+    
+    
 
+def upload(request):
+    if request.method == 'POST':
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                raw_data = request.FILES['file'].open('rb').read()
+                handle_city_import(raw_data)
+            except Exception as e:
+                messages.error(request, f'Not correct file format: {e}')
         
         return redirect(reverse_lazy('cities:home'))
     context = {'form': UploadForm()}
